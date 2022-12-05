@@ -27,7 +27,7 @@ multinomial_distribution_model = function(alphabet, length, probabilities) {
   return(res)
 }
 
-#' @title markov_model
+#' @title markow_model
 #'
 #' @description Generate a random sequence in the markow model with a specific lenght over a specified alphabet
 #' with a specified transition matrix and initial probabilities. Given an index set \eqn{I} with \eqn{r} elements then a \eqn{r\times r} matrix \eqn{(p_{ij})_{i,j \in I}}
