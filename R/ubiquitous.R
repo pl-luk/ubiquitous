@@ -100,6 +100,55 @@ rel_freq = function(sequence, alphabet, wordsize = 1, start = 0, count = FALSE) 
   return(res)
 }
 
+#' @title initialize_markow
+#'
+#' @description Calculates the transition matrix assuming a markow model specified by a given sequence with the respective alphabet. The exact calculation
+#' is described in \link{rel_freq}
+#'
+#' @param sequence The sequence the markow model should be based on
+#' @param alphabet The alphabet that is used by the sequence
+#' @param round The number of digits the contents of the transition matrix should be rounded to. If this value is zero or lower the values will stay as calculated.
+#'
+#' @return The calculated transition matrix
+initialize_markow = function(sequence, alphabet, round = 2) {
+  Fdi = rel_freq(sequence, alphabet, wordsize = 2, count = TRUE)
+  Fmo = rel_freq(sequence, alphabet, count = TRUE)
+
+  matrix_di = matrix(Fdi, length(alphabet), length(alphabet), byrow = TRUE)
+  matrix_mo = matrix(Fmo, length(alphabet), length(alphabet), byrow = FALSE)
+
+  res = matrix_di / matrix_mo
+
+  if(round > 0) {
+    res = round(res, round)
+  }
+
+  colnames(res) = alphabet
+  rownames(res) = alphabet
+
+  return(res)
+}
+
+#' @title initialize_markow
+#'
+#' @description Calculates the probability vector assuming a multinomial distribution model specified by a given sequence with the respective alphabet.
+#' The exact calculation is described in \link{rel_freq}
+#'
+#' @param sequence The sequence the multinomial distribution model should be based on
+#' @param alphabet The alphabet that is used by the sequence
+#' @param round The number of digits the contents of the probability vector should be rounded to. If this value is zero or lower the values will stay as calculated.
+#'
+#' @return The calculated probability vector
+initialize_multinomial = function(sequence, alphabet, round = 2) {
+  res = rel_freq(sequence, alphabet)
+
+  if(round > 0) {
+    res = round(res, round)
+  }
+
+  return(res)
+}
+
 #' @title gc_plot
 #'
 #' @description Calculate the GC content of a given sequence in frames with a given length and plot the GC content as a function of the \eqn{i}-th frame.
