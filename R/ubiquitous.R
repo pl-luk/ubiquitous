@@ -37,11 +37,15 @@ multinomial_distribution_model = function(alphabet, length, probabilities) {
 #' \eqn{\mathbb{P}(\textbf{s}) = p_{s_1}\prod_{l = 2}^n p_{s_{n-1}s_n}}
 #' @param alphabet The alphabet the sequence should be based on as a vector
 #' @param length The length of the generated sequence as an integer
-#' @param matrix The transition matrix so that rows and columns are named by their respective letters which can be accomplished by \code{rownames(...)} and \code{colnames(...)}. \code{matrix[i, j]} describes the probability that a state \eqn{i} is followed by state \eqn{j}
+#' @param matrix The transition matrix so that \code{matrix[i, j]} describes the probability that a state \eqn{i} is followed by state \eqn{j}
 #' @param initial_probabilities A vector of probabilities that a sequence is starting with the \eqn{i}-th letter of the alphabet. If this argument is empty
 #' an equal distribution is assumed (which does not matter for large sequences)
 #' @return A vector that contains the letters of the generated sequence
 markow_model = function(alphabet, length, matrix, initial_probabilities = NULL ) {
+
+  #update rownames and colnames for correct indexing
+  rownames(matrix) = alphabet
+  colnames(matrix) = alphabet
 
   if(is.null(initial_probabilities)) {
     initial_probabilities = rep(1 / length(alphabet), length(alphabet))
