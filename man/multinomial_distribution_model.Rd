@@ -14,7 +14,7 @@ multinomial_distribution_model(alphabet, length, probabilities)
 \item{probabilities}{A vector of probabilities so that the \eqn{i}-th element is the probability of the \eqn{i}-th letter of the alphabet.}
 }
 \value{
-A vector that contains the letters of the generated sequence
+A vector that contains the letters of the generated sequence. If sum of probabilities is not equal to 1 a warning is thrown
 }
 \description{
 Generate a random sequence in the multinomial distribution model with a specific length over a specified alphabet

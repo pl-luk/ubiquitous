@@ -1,3 +1,5 @@
+library(seqinr)
+
 #' @title equal_distribution_model
 #'
 #' @description Generate a random sequence in the equal distribution model with a specific length over a specified alphabet.
@@ -72,5 +74,28 @@ markow_model = function(alphabet, length, matrix, initial_probabilities = NULL )
     res[i] = sample(alphabet, 1, prob = matrix[res[i - 1],])
   }
 
+  return(res)
+}
+
+#' @title rel_freq
+#'
+#' @description Get the relative frequencies of words (pairs) in a given sequence with a specified alphabet.
+#' This can also used as a approximation for the required probabilities for the markow model or the multinomial distribution model. The relative frequency
+#' \eqn{\hat{p_i}} for a given state \eqn{i} in a sequence \eqn{\textbf{s}_{[1, L]}} with length \eqn{L}
+#' is given by \eqn{\hat{p_i} = \frac{\text{\# } i \text{ in }\textbf{s}_{[1, L]}}{L}} whilst the relative frequency of \eqn{\hat{p_{ij}}} for
+#' a given state \eqn{i} that is followed by state \eqn{j} in \eqn{\textbf{s}} is determined by
+#' \eqn{\hat{p_{ij}} = \frac{\text{\# } ij \text{ in } \textbf{s}_{[1, L]}}{\text{\# } i \text{ in }\textbf{s}_{[1, L - 1]}}}. If the single \eqn{\hat{p_i}} are
+#' clearly differing than an equal distribution can be ruled out.
+#' If the \eqn{\hat{p_{ij}}} are clearly differing from the single \eqn{\hat{p_j}} a multinomial distribution can be ruled out.
+#'
+#' @param sequence The sequence to be investigated
+#' @param alphabet The underlying alphabet of the input sequence
+#' @param wordsize The size of the words to be investigated
+#' @param start The start of the sequence
+#' @param count Switch if absolute instead of relative frequencies are desired
+#'
+#' @returns A vector containing the absolute or relative frequencies of the possible words with length \code{wordsize} found in the input sequence
+rel_freq = function(sequence, alphabet, wordsize = 1, start = 0, count = FALSE) {
+  res = count(sequence, wordsize, start, freq = !count, alphabet = alphabet)
   return(res)
 }

@@ -17,7 +17,8 @@ markow_model(alphabet, length, matrix, initial_probabilities = NULL)
 an equal distribution is assumed (which does not matter for large sequences)}
 }
 \value{
-A vector that contains the letters of the generated sequence
+A vector that contains the letters of the generated sequence. If either the sum of the rows of the transition matrix or the sum of the initial probabilities
+are not equal to 1 a warning is thrown
 }
 \description{
 Generate a random sequence in the markow model with a specific lenght over a specified alphabet
