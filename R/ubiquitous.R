@@ -21,8 +21,13 @@ equal_distribution_model = function(alphabet, length) {
 #' @param alphabet The alphabet the sequence should be based on as a vector
 #' @param length The length of the generated sequence as an integer
 #' @param probabilities A vector of probabilities so that the \eqn{i}-th element is the probability of the \eqn{i}-th letter of the alphabet.
-#' @return A vector that contains the letters of the generated sequence
+#' @return A vector that contains the letters of the generated sequence. If sum of probabilities is not equal to 1 a warning is thrown
 multinomial_distribution_model = function(alphabet, length, probabilities) {
+
+  if(sum(probabilities) != 1) {
+    warning("Sum of probabilities != 1")
+  }
+
   res = sample(alphabet, length, replace = TRUE, prob = probabilities)
   return(res)
 }
