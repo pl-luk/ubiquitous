@@ -7,11 +7,11 @@
 rel_freq(sequence, alphabet, wordsize = 1, start = 0, count = FALSE)
 }
 \arguments{
-\item{sequence}{The sequence to be investigated}
+\item{sequence}{The sequence to be analysed}
 
 \item{alphabet}{The underlying alphabet of the input sequence}
 
-\item{wordsize}{The size of the words to be investigated}
+\item{wordsize}{The size of the words to be analysed}
 
 \item{start}{The start of the sequence}
 

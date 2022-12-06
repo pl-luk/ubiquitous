@@ -88,14 +88,88 @@ markow_model = function(alphabet, length, matrix, initial_probabilities = NULL )
 #' clearly differing than an equal distribution can be ruled out.
 #' If the \eqn{\hat{p_{ij}}} are clearly differing from the single \eqn{\hat{p_j}} a multinomial distribution can be ruled out.
 #'
-#' @param sequence The sequence to be investigated
+#' @param sequence The sequence to be analysed
 #' @param alphabet The underlying alphabet of the input sequence
-#' @param wordsize The size of the words to be investigated
+#' @param wordsize The size of the words to be analysed
 #' @param start The start of the sequence
 #' @param count Switch if absolute instead of relative frequencies are desired
 #'
 #' @returns A vector containing the absolute or relative frequencies of the possible words with length \code{wordsize} found in the input sequence
 rel_freq = function(sequence, alphabet, wordsize = 1, start = 0, count = FALSE) {
   res = count(sequence, wordsize, start, freq = !count, alphabet = alphabet)
+  return(res)
+}
+
+#' @title gc_plot
+#'
+#' @description Calculate the GC content of a given sequence in frames with a given length and plot the GC content as a function of the \eqn{i}-th frame.
+#' The way this is calculated is described in \code{\link{rel_freq}}. By viewing the plot it is possible to estimate if GC contents are random or not. Given
+#' the relative frequencies \eqn{f} of a variable \eqn{x} in a frame with length \eqn{l} the true and unknown probability of \eqn{x} \eqn{p} can be described as
+#' an interval \eqn{p \in \left[f - \frac{2\sigma}{\sqrt{l}}, f + \frac{2\sigma}{\sqrt{l}} \right]} wheras \eqn{\sigma} is the standard deviation of \eqn{x}.
+#' The interval describes the \eqn{95\%} confidence interval thus in \eqn{5\%} of all cases the true value of \eqn{p} is element of the interval. Since the true
+#' standard diviation \eqn{\sigma = \sqrt(p(1-p))} cannot be calculated it has to be estimated by \eqn{\sigma = \sqrt{f(1 - f)}}. If used on the GC contents the
+#' random probability is given by \eqn{p = \frac{1}{4} + \frac{1}{4} = \frac{1}{2}} and thus the interval
+#' \eqn{\left[\frac{1}{2} - \frac{1}{\sqrt{l}}, \frac{1}{2} + \frac{1}{\sqrt{l}}\right]} which is also plotted. So if most of the GC contents are not in the
+#' plotted interval a non random GC content can be assumed.
+#'
+#' @param sequence The sequence to be analysed
+#' @param frame_length The length of the individual analysing frames
+#' @param plot_resolution The number of how much frequencies should be displayed
+gc_plot = function(sequence, frame_length, plot_resolution = 500) {
+  x = round(seq(frame_length / 2 , length(sequence) - frame_length / 2 - 1, length.out = plot_resolution))
+  FL2 = numeric(plot_resolution)
+  for (i in 1:plot_resolution) FL2[i] = GC(sequence[(x[i] - frame_length / 2):(x[i] + frame_length / 2 - 1)])
+  plot(x, FL2, type = "l", ylim = c(0,1), xlab = "frame", ylab = "GC-content")
+  abline(h = (0.5 + 1 / sqrt(frame_length)), col = "red")
+  abline(h = (0.5 - 1 / sqrt(frame_length)), col = "red")
+}
+
+#' @title gc_content
+#'
+#' @description This proceedure operates in the exact same way as \code{\link{gc_plot}} however instead of graphing the results of the analysis it returns its
+#' results. It is slower than \code{\link{gc_plot}} since it calculates all relative frequencies. If the deviation result is close to zero the GC distribution
+#' is probably random. If it's closer to one the distribution is probably not random.
+#'
+#' @param sequence The sequence to be analysed
+#' @param frame_length The length of the individual analysing frames
+#' @param interpretation A switch to determine if a vector with the relative frequencies should be returned or a value of how much the GC contents deviate from
+#' a random distribution.
+#'
+#' @returns Either a vector of relative GC contents or a single number indicating the deviation of a random GC distribution based on the value of
+#' \code{interpretation}
+gc_content = function(sequence, frame_length, interpretation = TRUE) {
+
+    FL = numeric(length(sequence) - frame_length + 1)
+    for(i in 1:(length(sequence) - frame_length + 1)) {
+      FL[i] = GC(sequence[i:(i + frame_length- 1)])
+    }
+
+    if(!interpretation) {
+      return(FL)
+    } else {
+      return(mean(FL > (0.5 + 1 / sqrt(frame_length)) | FL < (0.5 - 1 / sqrt(frame_length))))
+    }
+}
+
+#' @title read_dna_sequence
+#'
+#' @description Read a file of specified filetype containing DNA information and return the DNA sequence as a vector of characters.
+#'
+#' @param path The path to the file to be read
+#' @param filetype The type of the file to be read currently supported are the values \code{"fasta"} for .fasta files and \code{"dat"} for .dat files
+#'
+#' @returns The DNA sequence as a vector of characters
+read_dna_sequence = function(path, filetype){
+  res = NULL
+  if(filetype == "fasta"){
+    res = read.fasta(path)
+    res = res[[1]]
+    res = as.character(res)
+  }
+
+  if(filetype == "dat"){
+    res = scan(path, what="character")
+  }
+
   return(res)
 }
