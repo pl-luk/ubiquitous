@@ -40,7 +40,8 @@ multinomial_distribution_model = function(alphabet, length, probabilities) {
 #' @param matrix The transition matrix so that \code{matrix[i, j]} describes the probability that a state \eqn{i} is followed by state \eqn{j}
 #' @param initial_probabilities A vector of probabilities that a sequence is starting with the \eqn{i}-th letter of the alphabet. If this argument is empty
 #' an equal distribution is assumed (which does not matter for large sequences)
-#' @return A vector that contains the letters of the generated sequence
+#' @return A vector that contains the letters of the generated sequence. If either the sum of the rows of the transition matrix or the sum of the initial probabilities
+#' are not equal to 1 a warning is thrown
 markow_model = function(alphabet, length, matrix, initial_probabilities = NULL ) {
 
   #update rownames and colnames for correct indexing
@@ -49,6 +50,15 @@ markow_model = function(alphabet, length, matrix, initial_probabilities = NULL )
 
   if(is.null(initial_probabilities)) {
     initial_probabilities = rep(1 / length(alphabet), length(alphabet))
+  }
+
+  #alert if sum of probabilities are not equal to 1
+  if(sum(initial_probabilities) != 1) {
+    warning("Sum of initial_probabilities != 1")
+  }
+
+  if(prod(rowSums(matrix) == rep(1, length(a))) != 1) {
+    warning("Sum of one ore more row in the transition matrix != 1")
   }
 
   res = character(length)

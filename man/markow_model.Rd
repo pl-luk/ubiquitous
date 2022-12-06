@@ -11,7 +11,7 @@ markow_model(alphabet, length, matrix, initial_probabilities = NULL)
 
 \item{length}{The length of the generated sequence as an integer}
 
-\item{matrix}{The transition matrix so that rows and columns are named by their respective letters which can be accomplished by \code{rownames(...)} and \code{colnames(...)}. \code{matrix[i, j]} describes the probability that a state \eqn{i} is followed by state \eqn{j}}
+\item{matrix}{The transition matrix so that \code{matrix[i, j]} describes the probability that a state \eqn{i} is followed by state \eqn{j}}
 
 \item{initial_probabilities}{A vector of probabilities that a sequence is starting with the \eqn{i}-th letter of the alphabet. If this argument is empty
 an equal distribution is assumed (which does not matter for large sequences)}
