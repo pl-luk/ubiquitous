@@ -1,4 +1,9 @@
 library(seqinr)
+library(Biostrings)
+library(stringr)
+
+AMINO_ALPHABET = c(names(AMINO_ACID_CODE), "*")
+DNA_ALPHABET = c("A", "C", "G", "T")
 
 #' @title equal_distribution_model
 #'
@@ -198,6 +203,53 @@ gc_content = function(sequence, frame_length, interpretation = TRUE) {
     } else {
       return(mean(FL > (0.5 + 1 / sqrt(frame_length)) | FL < (0.5 - 1 / sqrt(frame_length))))
     }
+}
+
+#' @title dna_to_aa_sequence
+#'
+#' @description Utility function to resolve \code{translate} duplication from \code{Biostrings} and \code{seqinr} to apply a genetic code. Let
+#' \eqn{\mathscr{C} \subseteq \mathscr{N}^3} and two different symbols \eqn{\text{START, STOP}}. The elements of \eqn{\mathscr{C}} are being called codons. A
+#' genetic code \eqn{g} is a surjective function \eqn{g: \mathscr{C} \longrightarrow \mathscr{A} \cup \{\text{START, STOP}\}}. \eqn{\mathscr{N} = \{A, C, G, T\}},
+#' and the amino acids \eqn{\mathscr{A} = \{A, R, N, D, C, Q, E, G, H, I, L , K, M, F, P, S, T, W, Y, V\}}.
+#'
+#' @param sequence Input DNA Sequence
+#'
+#' @return Translated amino acid sequence
+dna_to_aa_sequence = function(sequence) {
+  return(seqinr::translate(sequence))
+}
+
+
+#' @title match_orfs
+#'
+#' @description Calculate all reading frames with a given length. Given a DNA Sequence \eqn{\textbf{s} = \textbf{s}_{[1, 3n]}} with length \eqn{3n}. Then a
+#' triplet sequence \eqn{(t_k)_{k \in [1, n]}} from \eqn{\mathscr{N}^3} with \eqn{t_k = \textbf{s}_{[3(k - 1) + 1, k]}} is called a reading frame of \eqn{\textbf{s}}.
+#' This output can be accomplished by switching \code{filter_orfs} to \code{FALSE}. For \code{filter_orfs = TRUE} all open reading frames are calculated.
+#' Given a genetic code \eqn{g} (\code{\link{dna_to_aa_sequence}}) and a DNA Sequence \eqn{\textbf{s}} with a partial sequence \eqn{\textbf{s}'} with length \eqn{3n}.
+#' A reading frame \eqn{(t_k)_{k \in [1, n]}} for \eqn{\textbf{s}'} is called an open reading frame regarfing \eqn{q} if \eqn{\forall k \in [1,n]: t_k \in \mathscr{C}},
+#' \eqn{g(t_1) = \text{START}}, \eqn{g(t_n) = \text{STOP}} and \eqn{\forall k \in [1, k - 1]: g(t_k) \neq \text{STOP}}.
+#'
+#' @param aa_sequence The input amino acid sequence based on \code{AMINO_ALPHABET}
+#' @param max_rf_length The maximum length of the reading frames
+#' @param filter_orfs Only return open reading frames
+#'
+#' @returns Either a \code{XStringViews} object of all reading frames or all open reading frames depending on \code{filter_orfs} without the STOP codon.
+match_orfs = function(aa_sequence, max_rf_length = 300, filter_orfs = TRUE) {
+  AAs = AAString(paste(aa_sequence, collapse = ""))
+  LRP = matchLRPatterns("M", "*", max_orf_length, AAs)
+
+  #Filter ORFs from RFs
+  valid = rep(TRUE, length(LRP))
+  if(filter_orfs){
+    for(i in 1:length(LRP)) {
+
+      if(str_count(as.character(LRP[i]), "\\*") > 1) {
+        valid[i] = FALSE
+      }
+    }
+  }
+
+  return(LRP[valid] - .5) #remove stop codon to get correct widths
 }
 
 #' @title read_dna_sequence
