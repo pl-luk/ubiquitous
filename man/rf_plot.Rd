@@ -4,7 +4,13 @@
 \alias{rf_plot}
 \title{rf_plot}
 \usage{
-rf_plot(rfs, max_rf_length = 300, quantile = 0.95, show_orf_quantile = TRUE)
+rf_plot(
+  rfs,
+  sequence,
+  max_rf_length = 300,
+  quantile = 0.95,
+  show_orf_quantile = TRUE
+)
 }
 \arguments{
 \item{rfs}{Input reading frames/open reading frames}
@@ -19,7 +25,7 @@ rf_plot(rfs, max_rf_length = 300, quantile = 0.95, show_orf_quantile = TRUE)
 The lowest probably (confidence level) not randomly distributed open reading frame length
 }
 \description{
-Plot the frequencies of the width of the input reading frames in a histogram. Assuming the original sequence was a equally distributed random
+Plot the frequencies of the width of the input reading frames in a histogram. Assuming the original sequence was a multinomially distributed random
 DNA Sequence a length can be calculated so that an open reading frame greater than that length is probably not described by a random distribution and thus
 biologically relevant. This length can be approximated by a quantile with a specified level of confidence. The quantile is also plotted. The probability that
 an open reading frame with length \eqn{\geq k} is found in a random distribution can be calculated as

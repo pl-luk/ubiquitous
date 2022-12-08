@@ -254,7 +254,7 @@ match_orfs = function(aa_sequence, max_rf_length = 300, filter_orfs = TRUE) {
 
 #' @title rf_plot
 #'
-#' @description Plot the frequencies of the width of the input reading frames in a histogram. Assuming the original sequence was a equally distributed random
+#' @description Plot the frequencies of the width of the input reading frames in a histogram. Assuming the original sequence was a multinomially distributed random
 #' DNA Sequence a length can be calculated so that an open reading frame greater than that length is probably not described by a random distribution and thus
 #' biologically relevant. This length can be approximated by a quantile with a specified level of confidence. The quantile is also plotted. The probability that
 #' an open reading frame with length \eqn{\geq k} is found in a random distribution can be calculated as
@@ -268,8 +268,8 @@ match_orfs = function(aa_sequence, max_rf_length = 300, filter_orfs = TRUE) {
 #' @param show_orf_quantile Plot the quantile
 #'
 #' @return The lowest probably (confidence level) not randomly distributed open reading frame length
-rf_plot = function(rfs, max_rf_length = 300, quantile = .95, show_orf_quantile = TRUE) {
-  random_dna = equal_distribution_model(DNA_ALPHABET, 200000)
+rf_plot = function(rfs, sequence, max_rf_length = 300, quantile = .95, show_orf_quantile = TRUE) {
+  random_dna = multinomial_distribution_model(DNA_ALPHABET, 200000, initialize_multinomial(sequence, DNA_ALPHABET))
   random_rf = match_orfs(dna_to_aa_sequence(random_dna), max_rf_length = max_rf_length, filter_orfs = FALSE)
   #Save time by only calculating widths of orfs
   random_widths = width(random_rf)[start(random_rf)!=c(0, start(random_rf)[-length(random_rf)])]-1
@@ -301,5 +301,5 @@ read_dna_sequence = function(path, filetype){
     res = scan(path, what="character")
   }
 
-  return(res)
+  return(toUpper(res))
 }
