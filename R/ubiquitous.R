@@ -236,7 +236,7 @@ dna_to_aa_sequence = function(sequence) {
 #' @returns Either a \code{XStringViews} object of all reading frames or all open reading frames depending on \code{filter_orfs} without the STOP codon.
 match_orfs = function(aa_sequence, max_rf_length = 300, filter_orfs = TRUE) {
   AAs = AAString(paste(aa_sequence, collapse = ""))
-  LRP = matchLRPatterns("M", "*", max_orf_length, AAs)
+  LRP = matchLRPatterns("M", "*", max_rf_length, AAs)
 
   #Filter ORFs from RFs
   valid = rep(TRUE, length(LRP))
@@ -251,6 +251,35 @@ match_orfs = function(aa_sequence, max_rf_length = 300, filter_orfs = TRUE) {
 
   return(LRP[valid] - .5) #remove stop codon to get correct widths
 }
+
+#' @title rf_plot
+#'
+#' @description Plot the frequencies of the width of the input reading frames in a histogram. Assuming the original sequence was a equally distributed random
+#' DNA Sequence a length can be calculated so that an open reading frame greater than that length is probably not described by a random distribution and thus
+#' biologically relevant. This length can be approximated by a quantile with a specified level of confidence. The quantile is also plotted. The probability that
+#' an open reading frame with length \eqn{\geq k} is found in a random distribution can be calculated as
+#' \eqn{\mathbb{P}(k) = \mathbb{P}(\text{STOP}) \cdot (1 - \mathbb{P}(\text{STOP})^{k-1}) = \frac{3}{64} \cdot \left(1 - \frac{3}{64}\right)^{k - 1}} which
+#' can also easily be calculated by \code{1 - ecdf(width(orfs))(k - 1)}. This equals to the p-value of how random the open reading frame actually is.
+#'
+#'
+#' @param rfs Input reading frames/open reading frames
+#' @param max_rf_length The maximum length of the reading frames
+#' @param quantile The level of confidence needed for quantile calculation
+#' @param show_orf_quantile Plot the quantile
+#'
+#' @return The lowest probably (confidence level) not randomly distributed open reading frame length
+rf_plot = function(rfs, max_rf_length = 300, quantile = .95, show_orf_quantile = TRUE) {
+  random_dna = equal_distribution_model(DNA_ALPHABET, 200000)
+  random_rf = match_orfs(dna_to_aa_sequence(random_dna), max_rf_length = max_rf_length, filter_orfs = FALSE)
+  #Save time by only calculating widths of orfs
+  random_widths = width(random_rf)[start(random_rf)!=c(0, start(random_rf)[-length(random_rf)])]-1
+  q = quantile(random_widths, quantile)
+
+  hist(width(rfs), breaks = 1000)
+  abline(v = q, col = "red")
+  return(q)
+}
+
 
 #' @title read_dna_sequence
 #'
