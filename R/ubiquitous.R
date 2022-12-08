@@ -263,6 +263,7 @@ match_orfs = function(aa_sequence, max_rf_length = 300, filter_orfs = TRUE) {
 #'
 #'
 #' @param rfs Input reading frames/open reading frames
+#' @param sequence Original DNA Sequence to initialize multinomial distribution
 #' @param max_rf_length The maximum length of the reading frames
 #' @param quantile The level of confidence needed for quantile calculation
 #' @param show_orf_quantile Plot the quantile
